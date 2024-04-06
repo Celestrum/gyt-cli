@@ -2,15 +2,13 @@ name: ""
 
 .var > 1
 
-? {}
->
->
-> ? {}
->   > 
->   >
-|
->
->
->
->
-END
+? {.var == 1}
+> gyt update
+> gyt build
+> gyt run "npm run dev"
+> ? {.var == 2}
+>   > echo waddup
+>   < echo goodbye
+<
+< echo hello
+
