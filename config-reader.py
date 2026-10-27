@@ -1,5 +1,5 @@
 path = "config.gytc"
-DEBUG = True
+DEBUG = False
 
 def print(*args, **kwargs):
     if kwargs.get("debug") and not DEBUG: return
@@ -22,7 +22,6 @@ def read_config():
     except:
         print("Error reading config file")
 
-config_data = read_config()
 
 @stalker_decorator
 def parse_var(line, *_):
@@ -48,10 +47,10 @@ def parse_condition(line, depth=0):
 def parse_if(line, index, depth):
     condition = parse_condition(line, depth)
     if condition:
-        print("Command is True")
+        print("Command is True", debug=True)
         return begin(start=index+1, end=len(config_data), depth=depth+1)
     else:
-        print("Condition is False")
+        print("Condition is False", debug=True)
         current_index = index
         while current_index < len(config_data):
             current_line = config_data[current_index]
@@ -68,8 +67,8 @@ def parse_command(line, index, depth=0):
     print("Command:", line)
         
 arg_binds = {
-    "\n": lambda *_ : None,                           # Parse NL 
-    "\.[a-z]+ > .": parse_var,                                   # Parse VAR
+    "\n": lambda *_ : None,                     # Parse NL 
+    "\.[a-z]+ > .": parse_var,                  # Parse VAR
     "([ ]*|> |>\t|> )*\? {.*\}": parse_if,      # Parse IF
     "(> *|< *).{1,}": parse_command
 }
@@ -79,10 +78,11 @@ arg_binds = {
 import re
 
 vars = dict()
+config_data = read_config()
 
 def begin(start=0,end=0,depth=0):
     y_cursor = start
-    print("Entering begin() at depth", depth)
+    print("Entering begin() at depth", depth, debug=True)
     while y_cursor < end:
         line = config_data[y_cursor].strip()
         if depth > 0:
@@ -90,6 +90,10 @@ def begin(start=0,end=0,depth=0):
             if not correct_depth: break
             # Strip the match from line
             line = line.lstrip(">")
+        else:
+            # Check if there is a >
+            if re.match("( *)(> *).", line): return y_cursor
+        
         print(f"{depth} | y_cursor=", y_cursor, " | ", config_data[y_cursor][:-1] , debug=True)
         for key in arg_binds:
             if re.match(key, line):
