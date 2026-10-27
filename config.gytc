@@ -2,6 +2,7 @@ name: ""
 
 .var > 1
 
+!BUILD
 ? {.var == 1}
 > gyt update
 > gyt build
@@ -12,3 +13,5 @@ name: ""
 <
 < echo hello
 
+!RUN
+> echo WADDUP
